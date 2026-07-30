@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* IDEATE Visual Identity — v.01 2026
+   Off-white breath · Forest voice · Navy punctuation · Ink depth */
+@theme {
+  --color-bg: #f5f2e6;
+  --color-bg-elevated: #fbf9f1;
+  --color-fg: #1c242c;
+  --color-muted: #4a554c;
+  --color-subtle: #7a857c;
+  --color-border: #ddd6c4;
+  --color-border-strong: #c4bba6;
+  --color-accent: #2d5b3a;
+  --color-accent-fg: #f5f2e6;
+  --color-forest: #2d5b3a;
+  --color-moss: #204029;
+  --color-midnight: #182a46;
+  --color-ink: #1c242c;
+  --color-cream: #f5f2e6;
+  --color-progress: #2d5b3a;
+  --color-ink-soft: #243028;
+  --color-choice-hover: #e8e2d0;
+  --color-danger: #9b2c2c;
+
+  --font-sans: "DM Sans", "Segoe UI", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Libre Baskerville", "Georgia", "Times New Roman", ui-serif, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --shadow-soft: 0 12px 40px rgba(28, 36, 44, 0.08);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-forest);
+    color: var(--color-cream);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@keyframes idea-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.idea-rise {
+  animation: idea-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .idea-rise {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+/* ── Calendly embed · IDEATE chrome ── */
+.ideate-calendly {
+  isolation: isolate;
+}
+.ideate-calendly-host {
+  background: #f5f2e6 !important;
+}
+.ideate-calendly-host iframe {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #f5f2e6 !important;
+}
+.ideate-calendly-bar {
+  animation: ideate-cal-slide 1.1s ease-in-out infinite;
+}
+@keyframes ideate-cal-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Soften Calendly outer chrome if any leaks through */
+.calendly-inline-widget {
+  min-width: 320px !important;
+}
