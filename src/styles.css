@@ -130,3 +130,10 @@
 .calendly-inline-widget {
   min-width: 320px !important;
 }
+
+/* MILES stage — no blue drag selection */
+.miles-dragging,
+.miles-dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}

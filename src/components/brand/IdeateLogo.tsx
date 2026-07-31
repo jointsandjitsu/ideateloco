@@ -24,7 +24,7 @@ export function IdeateLogo({
   );
 }
 
-/** Wordmark lockup: official mark + IDEATE text */
+/** Wordmark lockup: one line “IDEATE with Reid Hoffman” + slogans below */
 export function IdeateLockup({
   className = "",
   showSlogan = false,
@@ -40,15 +40,17 @@ export function IdeateLockup({
       <span className="leading-tight">
         <span
           className={[
-            "font-display block text-[15px] font-bold tracking-[0.08em] uppercase",
+            "font-display block text-[14px] font-bold tracking-[0.04em] sm:text-[15px]",
             inverted ? "text-cream" : "text-forest",
           ].join(" ")}
         >
-          IDEATE
+          IDEATE with Reid Hoffman
         </span>
         {showSlogan && (
-          <span className={inverted ? "text-[11px] text-cream/70" : "text-[11px] text-muted"}>
+          <span className={inverted ? "block text-[10px] text-cream/70" : "block text-[10px] text-muted"}>
             get miles ahead
+            <span className="mx-1 opacity-40">·</span>
+            ARTICULATING VISIONS · DELIVERING CONFIDENCE
           </span>
         )}
       </span>

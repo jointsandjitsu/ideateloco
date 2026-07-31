@@ -44,25 +44,46 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
     let seedStr = seed;
     let time = 0;
     let frameAccum = 0;
+    let userYaw = 0;
+    let userPitch = 0;
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setClearColor(0xf5f2e6, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.12;
     el.appendChild(renderer.domElement);
+    const dragOverlay = document.createElement("div");
+    dragOverlay.className = "miles-drag-zone";
+    Object.assign(dragOverlay.style, {
+      position: "absolute",
+      left: "0",
+      right: "0",
+      top: "0",
+      height: "48%",
+      zIndex: "2",
+      pointerEvents: "auto",
+      touchAction: "none",
+      userSelect: "none",
+      cursor: "grab",
+    });
+    el.appendChild(dragOverlay);
     Object.assign(renderer.domElement.style, {
       position: "absolute",
       inset: "0",
       width: "100%",
       height: "100%",
       display: "block",
-      pointerEvents: "none",
+      pointerEvents: "none", touchAction: "none", userSelect: "none",
     });
 
     const scene = new THREE.Scene();
@@ -380,10 +401,10 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
       return m;
     });
 
-    const camCompact = new THREE.Vector3(0, 1.18, 2.5);
-    const camExpanded = new THREE.Vector3(0, 1.22, 2.85);
-    const lookCompact = new THREE.Vector3(0, 1.02, 0);
-    const lookExpanded = new THREE.Vector3(0, 1.12, 0);
+    const camCompact = new THREE.Vector3(0, 0.95, 2.85);
+    const camExpanded = new THREE.Vector3(0, 0.98, 3.1);
+    const lookCompact = new THREE.Vector3(0, 0.78, 0);
+    const lookExpanded = new THREE.Vector3(0, 0.85, 0);
     const camPos = camCompact.clone();
     const lookAt = lookCompact.clone();
     camera.position.copy(camPos);
@@ -497,7 +518,7 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
         ctx.fillStyle = "rgba(245,242,230,0.75)";
         ctx.font = "700 22px system-ui, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(i === 0 ? "M" : "S", cx, h * 0.92);
+        ctx.fillText(i === 0 ? "M" : "D", cx, h * 0.92);
 
         screenTex[i]!.needsUpdate = true;
         const mat = screenMats[i]!;
@@ -518,6 +539,31 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
       camera.updateProjectionMatrix();
     }
 
+    
+    function onDown(e: PointerEvent) {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      el.classList.add("miles-dragging");
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+    }
+    function onUp() {
+      dragging = false;
+      el.classList.remove("miles-dragging");
+    }
+    function onDrag(e: PointerEvent) {
+      if (!dragging) return;
+      userYaw += (e.clientX - lastX) * 0.008;
+      userPitch = THREE.MathUtils.clamp(userPitch + (e.clientY - lastY) * 0.004, -0.35, 0.35);
+      lastX = e.clientX;
+      lastY = e.clientY;
+    }
+    function onDbl() {
+      userYaw = 0;
+      userPitch = 0;
+    }
+
     function onPointer(e: PointerEvent) {
       const rect = el.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
@@ -528,6 +574,10 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
     resize();
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onPointer);
+    dragOverlay.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+    dragOverlay.addEventListener("pointermove", onDrag);
+    dragOverlay.addEventListener("dblclick", onDbl);
 
     apiRef.current = {
       setCompact: (v) => {
@@ -581,7 +631,9 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
       torso.rotation.z = THREE.MathUtils.lerp(-0.02, 0.02, smooth(mouseSmooth.x, -1, 1));
       torso.rotation.x =
         THREE.MathUtils.lerp(0.05, -0.05, smooth(mouseSmooth.y, -1, 1)) + additive.torso.x + breath;
-      torso.rotation.y = THREE.MathUtils.lerp(0.1, -0.1, smooth(mouseSmooth.x, -1, 1));
+      const faceTrack = Math.abs(((userYaw % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) - Math.PI) > 2.0;
+      torso.rotation.y = THREE.MathUtils.lerp(0.1, -0.1, smooth(mouseSmooth.x, -1, 1)) * (faceTrack ? 0.15 : 1) + userYaw;
+      root.rotation.x = userPitch;
 
       neck2.rotation.x = rest.neck2.x + breath2 + additive.neck2.x;
       neck2.rotation.z = Math.sin(time * 0.2) * 0.025 + additive.neck2.z;
@@ -616,6 +668,10 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointer);
+      dragOverlay.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      dragOverlay.removeEventListener("pointermove", onDrag);
+      dragOverlay.removeEventListener("dblclick", onDbl);
       apiRef.current = null;
       renderer.dispose();
       pmrem.dispose();
@@ -632,6 +688,7 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
       badgeTex.dispose();
       ground.geometry.dispose();
       (ground.material as THREE.Material).dispose();
+      if (dragOverlay.parentElement === el) el.removeChild(dragOverlay);
       if (renderer.domElement.parentElement === el) el.removeChild(renderer.domElement);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -654,6 +711,6 @@ export function MilesVisualizer({ compact, mode, muted, speakLevel = 0, seed = "
   }, [seed]);
 
   return (
-    <div ref={hostRef} className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden />
+    <div ref={hostRef} className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none" aria-hidden />
   );
 }

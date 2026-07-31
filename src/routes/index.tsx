@@ -5,7 +5,6 @@ import { IdeaAssistant } from "@/components/idea/IdeaAssistant";
 import { StageBridgeProvider, useStageBridge } from "@/components/idea/stage-bridge";
 import { ImmersiveStage } from "@/components/stage/ImmersiveStage";
 import { ParallaxLayers } from "@/components/stage/ParallaxLayers";
-import { EmbedFrame } from "@/components/embed/EmbedFrame";
 import { CalendlyEmbed } from "@/components/schedule/CalendlyEmbed";
 import { IdeateLogo } from "@/components/brand/IdeateLogo";
 import { CornerBrand } from "@/components/brand/CornerBrand";
@@ -74,7 +73,7 @@ function HomeExperience() {
           href="#platform"
           className="absolute bottom-24 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-forest/15 bg-bg/75 px-3.5 py-1.5 text-[10px] font-medium tracking-[0.14em] text-forest/80 uppercase backdrop-blur-md sm:bottom-28"
         >
-          Continue
+          Explore platform
           <ArrowDown className="h-3 w-3 opacity-70" />
         </a>
       </section>

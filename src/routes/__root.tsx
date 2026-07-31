@@ -1,5 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
+import { MusicDock } from "@/components/music/MusicDock";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -39,6 +40,7 @@ function RootDocument() {
       <body>
         <AuthProvider>
           <Outlet />
+          <MusicDock />
         </AuthProvider>
         <Scripts />
       </body>

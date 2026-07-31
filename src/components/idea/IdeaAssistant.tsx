@@ -33,7 +33,7 @@ export function IdeaAssistant() {
   const [model, setModel] = useState<FlowModel>({});
   const [phase, setPhase] = useState<Phase>("typing");
   const [soundOn, setSoundOn] = useState(false);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(true);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([INITIAL_STEP]);
@@ -208,7 +208,7 @@ export function IdeaAssistant() {
   const hasInputs = !!(step.inputs && step.inputs.length);
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-bg text-fg">
+    <div className="relative h-dvh w-full select-none overflow-hidden bg-bg text-fg" style={{ WebkitUserSelect: "none", userSelect: "none" }}>
       <MilesVisualizer
         compact={isCompact}
         mode={milesMode}
@@ -225,8 +225,8 @@ export function IdeaAssistant() {
         }}
       />
 
-      <header className="absolute inset-x-0 top-0 z-30">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:h-16 sm:px-6">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
+        <div className="pointer-events-auto mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:h-16 sm:px-6">
           <button
             type="button"
             onClick={restart}
@@ -235,10 +235,10 @@ export function IdeaAssistant() {
           >
             <IdeateLogo className="h-10 w-10" priority />
             <span className="leading-tight">
-              <span className="font-display block text-[14px] font-bold tracking-[0.08em] text-forest uppercase">
-                {ASSISTANT.brand}
+              <span className="font-display block text-[13px] font-bold tracking-[0.04em] text-forest sm:text-[14px]">
+                IDEATE with Reid Hoffman
               </span>
-              <span className="block text-[11px] text-muted">get miles ahead</span>
+              <span className="block text-[10px] text-muted">get miles ahead · ARTICULATING VISIONS</span>
             </span>
           </button>
           <div className="rounded-full border border-forest/20 bg-bg/70 px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-forest uppercase backdrop-blur-sm sm:text-[12px]">
@@ -247,28 +247,10 @@ export function IdeaAssistant() {
         </div>
       </header>
 
-      {!audioUnlocked && (
-        <button
-          type="button"
-          onClick={unlockAudio}
-          className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-bg/25 backdrop-blur-[2px]"
-        >
-          <IdeateLogo className="h-20 w-20 drop-shadow-md sm:h-24 sm:w-24" priority />
-          <div className="text-center">
-            <p className="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold text-ink">
-              · get miles ahead ·
-            </p>
-            <p className="mt-2 text-[14px] text-muted">Meet MILES — easy, unhurried onboarding</p>
-          </div>
-          <span className="rounded-full bg-forest px-8 py-3.5 text-[13px] font-semibold tracking-[0.12em] text-accent-fg uppercase shadow-soft transition-transform hover:scale-[1.02] active:scale-[0.98]">
-            Begin
-          </span>
-        </button>
-      )}
 
       <div
         className={[
-          "absolute inset-x-0 bottom-0 z-20 flex flex-col transition-[top] duration-500 ease-out",
+          "pointer-events-none absolute inset-x-0 bottom-0 z-50 flex flex-col transition-[top] duration-500 ease-out",
           isCompact && !hasChoices && !hasInputs
             ? "top-[70%] sm:top-[72%]"
             : hasInputs || hasChoices
@@ -279,7 +261,7 @@ export function IdeaAssistant() {
         <div className="mx-auto h-full w-full max-w-6xl">
           <div
             ref={panelRef}
-            className="h-full overflow-y-auto rounded-t-[28px] border border-border/50 border-b-0 bg-bg/95 shadow-[0_-12px_50px_rgba(32,64,41,0.08)] backdrop-blur-sm"
+            className="pointer-events-auto h-full overflow-y-auto rounded-t-[28px] border border-border/50 border-b-0 bg-bg/95 shadow-[0_-12px_50px_rgba(32,64,41,0.08)] backdrop-blur-sm"
           >
             <div className="mx-auto max-w-3xl px-5 pb-24 pt-7 sm:px-10 sm:pt-9">
               <div className="min-h-[3.2rem]">
@@ -333,7 +315,7 @@ export function IdeaAssistant() {
                         key={`${c.label}-${idx}`}
                         type="button"
                         onClick={() => onChoice(c.target, c.modelUpdate, c.copyEmail, c.href)}
-                        className="inline-flex items-center gap-2 rounded-full bg-forest px-5 py-3 text-[13px] font-semibold tracking-wide text-accent-fg shadow-[0_8px_24px_rgba(45,91,58,0.2)] transition-all duration-200 hover:bg-moss hover:shadow-[0_10px_28px_rgba(32,64,41,0.28)] active:scale-[0.98]"
+                        className="inline-flex min-h-11 w-full items-center gap-2 rounded-2xl border border-forest/15 bg-bg-elevated px-4 py-3 text-left text-[13px] font-semibold tracking-wide text-ink shadow-sm transition-all duration-200 hover:border-forest/40 hover:bg-choice-hover active:scale-[0.99] sm:w-auto sm:rounded-full sm:bg-forest sm:px-5 sm:text-accent-fg sm:hover:bg-moss"
                       >
                         {isCopy ? (
                           <>
@@ -359,15 +341,6 @@ export function IdeaAssistant() {
                 </div>
               )}
 
-              {canContinue && (
-                <button
-                  type="button"
-                  onClick={() => step.next && goTo(step.next)}
-                  className="mt-8 text-[14px] font-semibold text-forest underline decoration-border-strong underline-offset-8 hover:decoration-forest"
-                >
-                  Continue
-                </button>
-              )}
 
               {phase === "ready" &&
                 step.autoAdvanceMs &&
@@ -385,7 +358,7 @@ export function IdeaAssistant() {
         <button
           type="button"
           onClick={goBack}
-          className="absolute bottom-5 left-4 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-forest text-accent-fg shadow-soft transition-transform active:scale-95 sm:bottom-6 sm:left-6"
+          className="absolute bottom-5 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-forest text-accent-fg shadow-soft transition-transform active:scale-95 sm:bottom-6 sm:left-6"
           aria-label="Go back"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -396,7 +369,7 @@ export function IdeaAssistant() {
         <button
           type="button"
           onClick={() => setSoundOn((s) => !s)}
-          className="absolute bottom-5 right-4 z-30 flex h-[68px] w-9 flex-col overflow-hidden rounded-full bg-forest sm:bottom-6 sm:right-6"
+          className="absolute bottom-5 right-4 z-50 flex h-[68px] w-9 flex-col overflow-hidden rounded-full bg-forest sm:bottom-6 sm:right-6"
           aria-label={soundOn ? "Mute MILES" : "Unmute MILES"}
         >
           <span

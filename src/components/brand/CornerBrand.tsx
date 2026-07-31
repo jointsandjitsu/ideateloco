@@ -1,17 +1,22 @@
-/** Persistent bottom-left lockup — always “IDEATE with Reid Hoffman” */
+/** Persistent bottom-left lockup — always “IDEATE with Reid Hoffman” + slogans */
 export function CornerBrand({ className = "" }: { className?: string }) {
   return (
     <div
       className={[
         "pointer-events-none select-none",
-        "font-display text-[11px] font-bold tracking-[0.06em] text-forest sm:text-[12px]",
         className,
       ].join(" ")}
       aria-hidden={false}
     >
-      <span className="uppercase">IDEATE</span>
-      <span className="mx-1 font-sans font-medium tracking-normal text-muted">with</span>
-      <span className="font-sans font-semibold tracking-normal text-ink">Reid Hoffman</span>
+      <div className="font-display text-[12px] font-bold tracking-[0.04em] text-forest sm:text-[13px]">
+        IDEATE with Reid Hoffman
+      </div>
+      <div className="mt-0.5 text-[9px] font-medium tracking-[0.06em] text-muted uppercase sm:text-[10px]">
+        get miles ahead
+      </div>
+      <div className="text-[8px] tracking-[0.08em] text-subtle uppercase sm:text-[9px]">
+        ARTICULATING VISIONS · DELIVERING CONFIDENCE
+      </div>
     </div>
   );
 }
